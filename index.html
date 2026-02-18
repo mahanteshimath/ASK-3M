@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ask 3M - In-Depth Explorer</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        
+        :root {
+            --primary: #E4002B;
+            --primary-dark: #B8001F;
+            --secondary: #1A1A2E;
+            --accent: #FF6B35;
+            --bg: #0F0F1A;
+            --card-bg: #1A1A2E;
+            --card-hover: #252542;
+            --text: #E8E8F0;
+            --text-muted: #9999B0;
+            --gradient-1: linear-gradient(135deg, #E4002B 0%, #FF6B35 100%);
+            --gradient-2: linear-gradient(135deg, #1A1A2E 0%, #2D2D4A 100%);
+            --aws-orange: #FF9900;
+            --success: #00D4AA;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+        
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            background: radial-gradient(ellipse at 30% 50%, rgba(228,0,43,0.15) 0%, transparent 50%),
+                        radial-gradient(ellipse at 70% 50%, rgba(255,107,53,0.1) 0%, transparent 50%),
+                        var(--bg);
+        }
+        
+        .hero::before {
+            content: '';
+            position: absolute;
+            width: 600px; height: 600px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(228,0,43,0.08) 0%, transparent 70%);
+            top: -200px; right: -200px;
+            animation: float 8s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(-30px, 30px); }
+        }
+        
+        .hero-content {
+            text-align: center;
+            z-index: 2;
+            padding: 2rem;
+            max-width: 900px;
+        }
+        
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(228,0,43,0.15);
+            border: 1px solid rgba(228,0,43,0.3);
+            padding: 8px 20px;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            color: #FF6B6B;
+            margin-bottom: 2rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        
+        .hero-badge .dot {
+            width: 8px; height: 8px;
+            background: #E4002B;
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.3); }
+        }
+        
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4.5rem);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+        }
+        
+        .hero h1 span {
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 650px;
+            margin: 0 auto 2.5rem;
+            line-height: 1.7;
+        }
+        
+        .hero-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--gradient-1);
+            color: white;
+            padding: 16px 36px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.05rem;
+            text-decoration: none;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .hero-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(228,0,43,0.4); }
+        
+        .scroll-indicator {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(10px); }
+        }
+        
+        .scroll-indicator svg { width: 30px; height: 30px; fill: var(--text-muted); }
+        
+        /* Navigation */
+        nav {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(15,15,26,0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 0 2rem;
+        }
+        
+        .nav-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+        
+        .nav-logo {
+            font-weight: 800;
+            font-size: 1.3rem;
+            color: white;
+        }
+        
+        .nav-logo span { color: var(--primary); }
+        
+        .nav-links {
+            display: flex;
+            gap: 8px;
+            list-style: none;
+            flex-wrap: wrap;
+        }
+        
+        .nav-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        
+        .nav-links a:hover, .nav-links a.active {
+            color: white;
+            background: rgba(228,0,43,0.15);
+        }
+        
+        /* Sections */
+        section { padding: 5rem 2rem; max-width: 1200px; margin: 0 auto; }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        
+        .section-tag {
+            display: inline-block;
+            background: rgba(228,0,43,0.1);
+            color: var(--primary);
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 1rem;
+        }
+        
+        .section-header h2 {
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        .section-header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+        
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            transform: translateY(-4px);
+            border-color: rgba(228,0,43,0.3);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+        }
+        
+        .card-icon {
+            width: 56px; height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1.2rem;
+        }
+        
+        .card h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+        }
+        
+        .card p {
+            color: var(--text-muted);
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+        
+        /* Workflow */
+        .workflow {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            position: relative;
+        }
+        
+        .workflow::before {
+            content: '';
+            position: absolute;
+            left: 35px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, var(--primary), var(--accent), var(--success));
+        }
+        
+        .workflow-step {
+            display: flex;
+            gap: 2rem;
+            align-items: flex-start;
+            padding: 2rem 0;
+            position: relative;
+        }
+        
+        .step-number {
+            width: 72px; height: 72px;
+            min-width: 72px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: var(--card-bg);
+            border: 3px solid var(--primary);
+            color: var(--primary);
+            z-index: 2;
+        }
+        
+        .step-content h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.6rem;
+        }
+        
+        .step-content p {
+            color: var(--text-muted);
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+        
+        /* Tech Stack */
+        .tech-stack {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .tech-item {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
+            padding: 1.8rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .tech-item:hover {
+            border-color: rgba(255,153,0,0.4);
+            transform: translateY(-3px);
+        }
+        
+        .tech-item .tech-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .tech-item h4 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .tech-item p {
+            color: var(--text-muted);
+            font-size: 0.88rem;
+            line-height: 1.6;
+        }
+        
+        /* Industries */
+        .industry-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .industry-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid rgba(255,255,255,0.06);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .industry-card:hover {
+            border-color: rgba(228,0,43,0.3);
+            transform: translateY(-3px);
+        }
+        
+        .industry-card .emoji { font-size: 2.5rem; margin-bottom: 1rem; display: block; }
+        .industry-card h4 { font-size: 1.1rem; margin-bottom: 0.6rem; }
+        .industry-card p { color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; }
+        
+        /* Timeline */
+        .timeline {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: rgba(228,0,43,0.3);
+            transform: translateX(-50%);
+        }
+        
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 3rem;
+            position: relative;
+        }
+        
+        .timeline-item:nth-child(odd) { flex-direction: row-reverse; }
+        
+        .timeline-date {
+            width: 45%;
+            text-align: right;
+            padding-right: 2rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--primary);
+        }
+        
+        .timeline-item:nth-child(odd) .timeline-date {
+            text-align: left;
+            padding-left: 2rem;
+            padding-right: 0;
+        }
+        
+        .timeline-dot {
+            width: 16px; height: 16px;
+            background: var(--primary);
+            border-radius: 50%;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2;
+            box-shadow: 0 0 0 4px rgba(228,0,43,0.2);
+        }
+        
+        .timeline-content {
+            width: 45%;
+            padding-left: 2rem;
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        
+        .timeline-item:nth-child(odd) .timeline-content {
+            padding-right: 2rem;
+        }
+        
+        .timeline-content h4 { font-size: 1rem; margin-bottom: 0.4rem; }
+        .timeline-content p { color: var(--text-muted); font-size: 0.88rem; line-height: 1.5; }
+        
+        /* Stats Bar */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 3rem 0;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 2rem;
+            background: var(--card-bg);
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        
+        .stat-item .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .stat-item .stat-label {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 0.3rem;
+        }
+        
+        /* Comparison Table */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 2rem;
+        }
+        
+        .comparison-table th {
+            background: rgba(228,0,43,0.15);
+            padding: 1rem 1.5rem;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border-bottom: 2px solid rgba(228,0,43,0.3);
+        }
+        
+        .comparison-table td {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .comparison-table tr:hover td {
+            background: rgba(228,0,43,0.05);
+        }
+        
+        /* Interactive Quiz / FAQ */
+        .faq-item {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+        
+        .faq-question {
+            padding: 1.3rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        
+        .faq-question:hover { background: rgba(228,0,43,0.05); }
+        
+        .faq-answer {
+            padding: 0 1.5rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            color: var(--text-muted);
+            line-height: 1.7;
+        }
+        
+        .faq-item.active .faq-answer {
+            padding: 0 1.5rem 1.5rem;
+            max-height: 500px;
+        }
+        
+        .faq-item.active .faq-chevron { transform: rotate(180deg); }
+        
+        .faq-chevron { transition: transform 0.3s; font-size: 1.2rem; }
+        
+        /* Footer */
+        footer {
+            background: var(--card-bg);
+            border-top: 1px solid rgba(255,255,255,0.06);
+            padding: 3rem 2rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        footer a { color: var(--primary); text-decoration: none; }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .workflow::before { left: 35px; }
+            .timeline::before { left: 20px; }
+            .timeline-item, .timeline-item:nth-child(odd) { flex-direction: column; align-items: flex-start; padding-left: 50px; }
+            .timeline-date, .timeline-item:nth-child(odd) .timeline-date { width: 100%; text-align: left; padding: 0 0 0.5rem 0; }
+            .timeline-content, .timeline-item:nth-child(odd) .timeline-content { width: 100%; padding: 1.5rem; }
+            .timeline-dot { left: 20px; }
+            .cards-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Hero Section -->
+<div class="hero" id="home">
+    <div class="hero-content">
+        <div class="hero-badge">
+            <span class="dot"></span>
+            AI-Powered Engineering Assistant
+        </div>
+        <h1>Discover <span>Ask 3M</span></h1>
+        <p>3M's revolutionary AI-powered digital assistant that combines decades of material science expertise with generative AI to help engineers solve design challenges in minutes, not months.</p>
+        <a href="#overview" class="hero-cta" onclick="smoothScroll('overview')">
+            Explore In Depth ↓
+        </a>
+    </div>
+    <div class="scroll-indicator">
+        <svg viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+    </div>
+</div>
+
+<!-- Navigation -->
+<nav>
+    <div class="nav-inner">
+        <div class="nav-logo">Ask <span>3M</span> Explorer</div>
+        <ul class="nav-links">
+            <li><a href="#overview" onclick="smoothScroll('overview')">Overview</a></li>
+            <li><a href="#workflow" onclick="smoothScroll('workflow')">How It Works</a></li>
+            <li><a href="#tech" onclick="smoothScroll('tech')">Tech Stack</a></li>
+            <li><a href="#features" onclick="smoothScroll('features')">Features</a></li>
+            <li><a href="#industries" onclick="smoothScroll('industries')">Industries</a></li>
+            <li><a href="#timeline" onclick="smoothScroll('timeline')">Timeline</a></li>
+            <li><a href="#faq" onclick="smoothScroll('faq')">FAQ</a></li>
+        </ul>
+    </div>
+</nav>
+
+<!-- Overview Section -->
+<section id="overview">
+    <div class="section-header">
+        <span class="section-tag">Overview</span>
+        <h2>What Is Ask 3M?</h2>
+        <p>An AI-powered digital assistant that transforms how engineers discover, evaluate, and select materials from 3M's vast portfolio.</p>
+    </div>
+    
+    <div class="stats-bar">
+        <div class="stat-item">
+            <div class="stat-number">100+</div>
+            <div class="stat-label">Years of Material Science</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">60K+</div>
+            <div class="stat-label">Products in Portfolio</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">$86B+</div>
+            <div class="stat-label">Market Capitalization</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-number">CES 2026</div>
+            <div class="stat-label">Official Debut</div>
+        </div>
+    </div>
+    
+    <div class="cards-grid">
+        <div class="card">
+            <div class="card-icon" style="background: rgba(228,0,43,0.15); color: #E4002B;">🤖</div>
+            <h3>AI-Powered Assistant</h3>
+            <p>Ask 3M is a generative AI digital assistant that helps engineers find solutions to design challenges using 3M's vast portfolio of adhesives, tapes, and advanced materials. It acts like having a 3M technical expert available 24/7.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon" style="background: rgba(0,212,170,0.15); color: #00D4AA;">⚡</div>
+            <h3>Minutes, Not Months</h3>
+            <p>Engineers can move from design challenge to 3M solution concept in minutes. The tool eliminates the need to manually search through thousands of technical datasheets or rely on trial-and-error prototyping.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon" style="background: rgba(255,153,0,0.15); color: #FF9900;">☁️</div>
+            <h3>Built on AWS</h3>
+            <p>Powered by Amazon Web Services' AI capabilities, including Amazon Bedrock and AgentCore, ensuring enterprise-grade security, scalability, and reliable performance for engineering workflows.</p>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works -->
+<section id="workflow">
+    <div class="section-header">
+        <span class="section-tag">Workflow</span>
+        <h2>How Ask 3M Works</h2>
+        <p>A step-by-step journey from design challenge to optimal material solution.</p>
+    </div>
+    
+    <div class="workflow">
+        <div class="workflow-step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+                <h3>Ask Your Design Challenge</h3>
+                <p>Engineers describe their bonding or assembly challenge in natural language. The AI understands context about substrates, environmental conditions, load requirements, and design constraints — just like talking to an expert.</p>
+            </div>
+        </div>
+        <div class="workflow-step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+                <h3>Ask 3M Reviews Your Use Case</h3>
+                <p>The AI assistant analyzes the engineer's specific requirements — questioning substrates, environments, assembly methods, and performance targets. It leverages 3M's decades of material science knowledge to understand the problem deeply.</p>
+            </div>
+        </div>
+        <div class="workflow-step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+                <h3>AI Recommends Optimal Solutions</h3>
+                <p>Based on the analysis, Ask 3M recommends the most suitable adhesives, tapes, or materials from 3M's portfolio. Each recommendation is backed by technical data and designed to meet the specific performance criteria.</p>
+            </div>
+        </div>
+        <div class="workflow-step">
+            <div class="step-number">4</div>
+            <div class="step-content">
+                <h3>Digital Validation &amp; Simulation</h3>
+                <p>Engineers can digitally validate recommended materials using simulation-ready data cards before investing in physical prototypes. Integration with the 3M Digital Materials Hub enables virtual testing and optical model simulation.</p>
+            </div>
+        </div>
+        <div class="workflow-step">
+            <div class="step-number">5</div>
+            <div class="step-content">
+                <h3>Prototype &amp; Purchase</h3>
+                <p>Small quantity purchase options allow for final, confident prototyping. Engineers can quickly move from digital selection to physical testing with accelerated timeframes.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Tech Stack -->
+<section id="tech">
+    <div class="section-header">
+        <span class="section-tag">Technology</span>
+        <h2>Technology Architecture</h2>
+        <p>The powerful AI and cloud infrastructure powering Ask 3M.</p>
+    </div>
+    
+    <div class="tech-stack">
+        <div class="tech-item">
+            <div class="tech-icon">🧠</div>
+            <h4>Generative AI</h4>
+            <p>Uses large language models and generative AI to understand engineering queries, interpret design challenges, and generate contextual material recommendations.</p>
+        </div>
+        <div class="tech-item">
+            <div class="tech-icon">🏗️</div>
+            <h4>Amazon Bedrock</h4>
+            <p>AWS's fully managed generative AI service provides access to high-performing foundation models via a unified API for the assistant's core intelligence layer.</p>
+        </div>
+        <div class="tech-item">
+            <div class="tech-icon">⚙️</div>
+            <h4>Amazon AgentCore</h4>
+            <p>Enterprise-grade agentic platform for secure, serverless deployment with session isolation, memory persistence, tool integration, and comprehensive monitoring.</p>
+        </div>
+        <div class="tech-item">
+            <div class="tech-icon">📊</div>
+            <h4>Advanced Modeling</h4>
+            <p>Simulation-ready data cards and optical models enable engineers to digitally validate materials and assess performance tradeoffs before physical prototyping.</p>
+        </div>
+        <div class="tech-item">
+            <div class="tech-icon">🔗</div>
+            <h4>Digital Materials Hub</h4>
+            <p>Companion platform with 300+ AI-powered product model combinations, enabling access to mechanical models, optical models, and virtual materials data.</p>
+        </div>
+        <div class="tech-item">
+            <div class="tech-icon">🔒</div>
+            <h4>Enterprise Security</h4>
+            <p>Built with VPC connectivity, AWS PrivateLink support, complete session isolation, and comprehensive controls for enterprise-grade security at scale.</p>
+        </div>
+    </div>
+    
+    <div style="margin-top: 3rem;">
+        <h3 style="text-align:center; margin-bottom: 1.5rem; font-size: 1.3rem;">Ask 3M vs Traditional Approach</h3>
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Aspect</th>
+                    <th>Traditional Method</th>
+                    <th style="color: var(--primary);">Ask 3M (AI-Powered)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Material Discovery</strong></td>
+                    <td>Manual search through datasheets</td>
+                    <td>Instant AI-powered recommendations</td>
+                </tr>
+                <tr>
+                    <td><strong>Time to Solution</strong></td>
+                    <td>Days to weeks</td>
+                    <td>Minutes</td>
+                </tr>
+                <tr>
+                    <td><strong>Expertise Required</strong></td>
+                    <td>Deep domain knowledge needed</td>
+                    <td>Natural language queries</td>
+                </tr>
+                <tr>
+                    <td><strong>Validation</strong></td>
+                    <td>Physical prototypes first</td>
+                    <td>Digital simulation first</td>
+                </tr>
+                <tr>
+                    <td><strong>Iteration Cycles</strong></td>
+                    <td>Multiple costly rounds</td>
+                    <td>Reduced iterations via virtual testing</td>
+                </tr>
+                <tr>
+                    <td><strong>Scale</strong></td>
+                    <td>Limited by human availability</td>
+                    <td>24/7 availability, any scale</td>
+                </tr>
+                <tr>
+                    <td><strong>Custom Materials</strong></td>
+                    <td>Lengthy R&amp;D process</td>
+                    <td>Request bespoke virtual materials</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- Key Features -->
+<section id="features">
+    <div class="section-header">
+        <span class="section-tag">Features</span>
+        <h2>Key Capabilities</h2>
+        <p>What makes Ask 3M a game-changer for engineering workflows.</p>
+    </div>
+    
+    <div class="cards-grid">
+        <div class="card">
+            <div class="card-icon" style="background: rgba(228,0,43,0.15); color: #E4002B;">💬</div>
+            <h3>Natural Language Interface</h3>
+            <p>Engineers describe challenges in plain language. The AI understands substrates, environments, assembly methods, load requirements, and performance targets without needing specialized query syntax.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon" style="background: rgba(0,212,170,0.15); color: #00D4AA;">🎯</div>
+            <h3>Contextual Recommendations</h3>
+            <p>Guides users through a structured interview about their design challenge — questioning substrates, environmental conditions, and assembly methods — then recommends the most suitable 3M materials.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon" style="background: rgba(255,153,0,0.15); color: #FF9900;">🔬</div>
+            <h3>Simulation-Ready Data</h3>
+            <p>Provides material data cards optimized for direct use in common FEA (Finite Element Analysis) simulation environments, enabling digital validation before physical prototyping.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon" style="background: rgba(100,100,255,0.15); color: #7B7BFF;">🔮</div>
+            <h3>Virtual Materials Creation</h3>
+            <p>Request bespoke virtual materials that don't yet exist but could solve specific design challenges. 3M leverages its deep expertise to accelerate the development of these unique solutions.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon" style="background: rgba(255,107,53,0.15); color: #FF6B35;">👁️</div>
+            <h3>Optical Models</h3>
+            <p>Access 3M optical film performance data for use in simulation environments. Engineers in automotive and electronics can assess optical behaviors and material tradeoffs early in the design process.</p>
+        </div>
+        <div class="card">
+            <div class="card-icon" style="background: rgba(0,150,255,0.15); color: #0096FF;">🤝</div>
+            <h3>Scientist Collaboration</h3>
+            <p>The Workbench feature in the Digital Materials Hub enables direct collaboration with 3M scientists for complex challenges that go beyond standard recommendations.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Industries -->
+<section id="industries">
+    <div class="section-header">
+        <span class="section-tag">Applications</span>
+        <h2>Target Industries</h2>
+        <p>Ask 3M is being deployed across fast-paced industries where speed to market is critical.</p>
+    </div>
+    
+    <div class="industry-grid">
+        <div class="industry-card">
+            <span class="emoji">🚗</span>
+            <h4>Automotive</h4>
+            <p>Bonding solutions for EV batteries, interior displays, lightweighting, and structural assembly. From head-up displays to thermal management materials.</p>
+        </div>
+        <div class="industry-card">
+            <span class="emoji">📱</span>
+            <h4>Consumer Electronics</h4>
+            <p>Adhesive and tape solutions for device assembly, display bonding, EMI shielding, and miniaturization. Enabling more capable, efficient devices.</p>
+        </div>
+        <div class="industry-card">
+            <span class="emoji">🏭</span>
+            <h4>Advanced Manufacturing</h4>
+            <p>Production line efficiency with custom adhesive extrusion, material monitoring, and worker safety equipment across manufacturing processes.</p>
+        </div>
+        <div class="industry-card">
+            <span class="emoji">🖥️</span>
+            <h4>Data Centers</h4>
+            <p>Cable preparation, performance monitoring, thermal management, and high-speed connectivity solutions for next-generation AI computing infrastructure.</p>
+        </div>
+        <div class="industry-card">
+            <span class="emoji">🔧</span>
+            <h4>Safety &amp; Industrial</h4>
+            <p>The primary pilot group — focused on bonding design challenges using tapes and adhesives within 3M's Safety &amp; Industrial Business Group.</p>
+        </div>
+        <div class="industry-card">
+            <span class="emoji">🔋</span>
+            <h4>Energy &amp; Renewables</h4>
+            <p>Solutions for battery bonding, thermal management, electrical insulation, and advanced materials for renewable energy applications.</p>
+        </div>
+    </div>
+</section>
+
+<!-- Timeline -->
+<section id="timeline">
+    <div class="section-header">
+        <span class="section-tag">Evolution</span>
+        <h2>Journey to Ask 3M</h2>
+        <p>3M's digital transformation from material science leader to AI-powered innovation platform.</p>
+    </div>
+    
+    <div class="timeline">
+        <div class="timeline-item">
+            <div class="timeline-date">2018</div>
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+                <h4>C3.ai Partnership</h4>
+                <p>3M selected C3.ai as strategic AI software platform for digital transformation, starting with predictive healthcare and supply chain analytics.</p>
+            </div>
+        </div>
+        <div class="timeline-item">
+            <div class="timeline-date">2021-2024</div>
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+                <h4>Internal AI R&amp;D</h4>
+                <p>Partnership with Argonne National Laboratory for energy efficiency. Strategic investments in enabling technologies like Ayar Labs for future data center hardware.</p>
+            </div>
+        </div>
+        <div class="timeline-item">
+            <div class="timeline-date">Early 2025</div>
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+                <h4>Digital Materials Hub Launch</h4>
+                <p>Initial launch of the 3M Digital Materials Hub with AI-powered product model combinations for material discovery and simulation.</p>
+            </div>
+        </div>
+        <div class="timeline-item">
+            <div class="timeline-date">Sep 2025</div>
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+                <h4>Data Center Solutions</h4>
+                <p>Launch of advanced solutions for AI data center efficiency, speed, and reliability — transitioning from internal R&amp;D to commercial products.</p>
+            </div>
+        </div>
+        <div class="timeline-item">
+            <div class="timeline-date">Dec 2025</div>
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+                <h4>Ask 3M Announced</h4>
+                <p>3M officially announced Ask 3M AI assistant and expanded Digital Materials Hub ahead of CES 2026 debut.</p>
+            </div>
+        </div>
+        <div class="timeline-item">
+            <div class="timeline-date">Jan 2026</div>
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+                <h4>CES 2026 Debut</h4>
+                <p>Ask 3M showcased at CES 2026 (Booth #8505). Pilot launched with Safety &amp; Industrial Business Group engineers for bonding design challenges.</p>
+            </div>
+        </div>
+        <div class="timeline-item">
+            <div class="timeline-date">2026+</div>
+            <div class="timeline-dot"></div>
+            <div class="timeline-content">
+                <h4>Expansion Ahead</h4>
+                <p>Additional applications, industries, and workflows being added. Expansion beyond adhesives and tapes to broader 3M material portfolio.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Key People -->
+<section id="people">
+    <div class="section-header">
+        <span class="section-tag">Leadership</span>
+        <h2>Key People Behind Ask 3M</h2>
+    </div>
+    
+    <div class="cards-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+        <div class="card" style="text-align:center;">
+            <div style="width:72px;height:72px;border-radius:50%;background:var(--gradient-1);display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 1rem;">WB</div>
+            <h3>William Brown</h3>
+            <p style="color:var(--primary);font-weight:600;margin-bottom:0.5rem;">Chairman &amp; CEO, 3M</p>
+            <p>"3M is reigniting our innovation engine and focusing R&amp;D on high-impact markets as we increase introduction of new products."</p>
+        </div>
+        <div class="card" style="text-align:center;">
+            <div style="width:72px;height:72px;border-radius:50%;background:var(--gradient-1);display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 1rem;">HS</div>
+            <h3>Holly Semerad</h3>
+            <p style="color:var(--primary);font-weight:600;margin-bottom:0.5rem;">CMO, Safety &amp; Industrial</p>
+            <p>"We're combining decades of material science with AI so engineers can make better decisions, faster."</p>
+        </div>
+        <div class="card" style="text-align:center;">
+            <div style="width:72px;height:72px;border-radius:50%;background:var(--gradient-1);display:flex;align-items:center;justify-content:center;font-size:1.8rem;margin:0 auto 1rem;">JL</div>
+            <h3>Jason Langfield</h3>
+            <p style="color:var(--primary);font-weight:600;margin-bottom:0.5rem;">Digital Materials Hub Lead</p>
+            <p>"3M is redefining how engineers discover, evaluate, and simulate materials with secure, scalable access."</p>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+    <div class="section-header">
+        <span class="section-tag">FAQ</span>
+        <h2>Frequently Asked Questions</h2>
+    </div>
+    
+    <div style="max-width: 800px; margin: 0 auto;">
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFaq(this)">
+                Is Ask 3M available to the public?
+                <span class="faq-chevron">▼</span>
+            </div>
+            <div class="faq-answer">Ask 3M is currently in pilot phase, primarily with engineers within 3M's Safety &amp; Industrial Business Group. 3M is accepting sign-ups on their official website to be notified when broader access becomes available. The tool debuted at CES 2026 in January.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFaq(this)">
+                What types of materials does Ask 3M cover?
+                <span class="faq-chevron">▼</span>
+            </div>
+            <div class="faq-answer">Initially, Ask 3M focuses on adhesives and tapes for bonding design challenges. This includes structural adhesives, VHB tapes, double-coated tapes, adhesive transfer tapes, and various specialty bonding solutions. 3M has stated that additional applications, industries, and workflows are being added over time.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFaq(this)">
+                How does Ask 3M differ from a regular chatbot?
+                <span class="faq-chevron">▼</span>
+            </div>
+            <div class="faq-answer">Unlike generic chatbots, Ask 3M is purpose-built for engineering workflows. It has deep knowledge of 3M's material science portfolio, understands technical parameters (substrates, environmental conditions, load requirements), and provides simulation-ready data. It's more like having an expert 3M technical engineer available 24/7 than a customer service bot.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFaq(this)">
+                What cloud technology powers Ask 3M?
+                <span class="faq-chevron">▼</span>
+            </div>
+            <div class="faq-answer">Ask 3M is built on Amazon Web Services (AWS) AI capabilities, specifically Amazon Bedrock for foundation model access and Amazon Bedrock AgentCore for enterprise-grade agent deployment, security, memory management, and serverless execution.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFaq(this)">
+                Can Ask 3M create materials that don't exist?
+                <span class="faq-chevron">▼</span>
+            </div>
+            <div class="faq-answer">Through the expanded 3M Digital Materials Hub, customers can request bespoke virtual materials — technologies that solve specific design challenges but don't yet exist. 3M leverages its decades of material science expertise to accelerate the development and delivery of these unique solutions.</div>
+        </div>
+        <div class="faq-item">
+            <div class="faq-question" onclick="toggleFaq(this)">
+                What is the 3M Digital Materials Hub?
+                <span class="faq-chevron">▼</span>
+            </div>
+            <div class="faq-answer">The Digital Materials Hub is a companion platform to Ask 3M. Launched in early 2025 and expanded for CES 2026, it provides access to verified material data cards, mechanical models, optical models, and virtual materials. It also features a Workbench for direct collaboration with 3M scientists and has 300+ AI-powered product model combinations.</div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer>
+    <p style="margin-bottom: 0.5rem;"><strong>Ask 3M In-Depth Explorer</strong> — Educational Web App</p>
+    <p>Data sourced from 3M official announcements, CES 2026, and public reports.</p>
+    <p style="margin-top: 1rem;">Official: <a href="https://www.3m.com/3M/en_US/company-us/ask-3m/" target="_blank">3m.com/ask-3m</a> · Digital Hub: <a href="https://digitalmaterialshub.3m.com" target="_blank">digitalmaterialshub.3m.com</a></p>
+</footer>
+
+<script>
+    function smoothScroll(id) {
+        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    function toggleFaq(el) {
+        el.parentElement.classList.toggle('active');
+    }
+    
+    // Intersection Observer for nav active state
+    const sections = document.querySelectorAll('section');
+    const navLinks = document.querySelectorAll('.nav-links a');
+    
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === '#' + entry.target.id) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+        });
+    }, { threshold: 0.3 });
+    
+    sections.forEach(section => observer.observe(section));
+    
+    // Animate cards on scroll
+    const cards = document.querySelectorAll('.card, .tech-item, .industry-card, .stat-item');
+    const cardObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, { threshold: 0.1 });
+    
+    cards.forEach(card => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(20px)';
+        card.style.transition = 'all 0.6s ease';
+        cardObserver.observe(card);
+    });
+</script>
+
+</body>
+</html>
+
